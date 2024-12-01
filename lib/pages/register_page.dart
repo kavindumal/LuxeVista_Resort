@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'register_page.dart'; // Import the register page
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  String _name = '';
   String _email = '';
+  String _phoneNumber = '';
   String _password = '';
-  bool _rememberMe = false;
+  String _confirmPassword = '';
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -31,10 +32,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
-  void _login() {
+  void _register() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Perform login logic
+      // Perform registration logic
     }
   }
 
@@ -74,7 +75,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       children: <Widget>[
                         Center(
                           child: Text(
-                            'Welcome Back!',
+                            'Create Account',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -83,6 +84,29 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           ),
                         ),
                         SizedBox(height: 20),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.2),
+                            labelText: 'Name',
+                            labelStyle: TextStyle(color: Colors.white),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.person, color: Colors.white),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter your name';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _name = value!;
+                          },
+                        ),
+                        SizedBox(height: 15),
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
@@ -114,6 +138,30 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
+                            labelText: 'Phone Number',
+                            labelStyle: TextStyle(color: Colors.white),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.phone, color: Colors.white),
+                          ),
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter your phone number';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _phoneNumber = value!;
+                          },
+                        ),
+                        SizedBox(height: 15),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Password',
                             labelStyle: TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
@@ -137,28 +185,36 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           },
                         ),
                         SizedBox(height: 15),
-                        Row(
-                          children: <Widget>[
-                            Checkbox(
-                              value: _rememberMe,
-                              onChanged: (value) {
-                                setState(() {
-                                  _rememberMe = value!;
-                                });
-                              },
-                              activeColor: Colors.white,
-                              checkColor: Colors.blue,
+                        TextFormField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.2),
+                            labelText: 'Confirm Password',
+                            labelStyle: TextStyle(color: Colors.white),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
                             ),
-                            Text(
-                              'Remember Me',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
+                            prefixIcon: Icon(Icons.lock, color: Colors.white),
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please confirm your password';
+                            }
+                            if (value != _password) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _confirmPassword = value!;
+                          },
                         ),
                         SizedBox(height: 15),
                         ElevatedButton(
-                          onPressed: _login,
-                          child: Text('Login'),
+                          onPressed: _register,
+                          child: Text('Register'),
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -169,26 +225,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             elevation: 5,
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            // Navigate to forgot password page
-                          },
-                          child: Text('Forgot Password?'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
                         SizedBox(height: 10),
                         Center(
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => RegisterPage()),
-                              );
+                              // Navigate to login page
                             },
                             child: Text(
-                              'Don\'t have an account? Register',
+                              'Already have an account? Login',
                               style: TextStyle(
                                 color: Colors.white,
                                 decoration: TextDecoration.underline,
