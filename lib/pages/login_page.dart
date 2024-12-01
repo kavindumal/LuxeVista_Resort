@@ -85,13 +85,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Email',
+                            labelStyle: TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.email, color: Colors.blue),
+                            prefixIcon: Icon(Icons.email, color: Colors.white),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
@@ -111,13 +112,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Password',
+                            labelStyle: TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.lock, color: Colors.blue),
+                            prefixIcon: Icon(Icons.lock, color: Colors.white),
                           ),
                           obscureText: true,
                           validator: (value) {
@@ -160,9 +162,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            backgroundColor: Colors.blue.shade600,
+                            backgroundColor: Colors.white.withOpacity(0.8),
                             padding: EdgeInsets.symmetric(vertical: 15),
-                            textStyle: TextStyle(fontSize: 18),
+                            textStyle: TextStyle(fontSize: 18, color: Colors.blue),
                             elevation: 5,
                           ),
                         ),
