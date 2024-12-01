@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:luxevista_resort/pages/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -229,8 +230,11 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                         Center(
                           child: GestureDetector(
                             onTap: () {
-                              // Navigate to login page
-                            },
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => LoginPage()),
+                                );
+                              },
                             child: Text(
                               'Already have an account? Login',
                               style: TextStyle(
