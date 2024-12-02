@@ -20,6 +20,8 @@ dependencies:
   firebase_auth: ^5.3.3
   google_sign_in: ^6.2.2
   cloud_firestore: ^5.5.0
+  geolocator: ^13.0.2
+  google_maps_webservice: ^0.0.20-nullsafety.5
 
 dev_dependencies:
   flutter_test:
