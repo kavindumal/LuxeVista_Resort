@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:luxevista_resort/pages/dashboard_page.dart';
 import 'register_page.dart'; // Import the register page
 
 class LoginPage extends StatefulWidget {
@@ -32,11 +33,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   void _login() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      // Perform login logic
-    }
+  if (_formKey.currentState!.validate()) {
+    _formKey.currentState!.save();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Dashboard()),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -171,7 +175,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         ),
                         TextButton(
                           onPressed: () {
-                            // Navigate to forgot password page
+                            
                           },
                           child: Text('Forgot Password?'),
                           style: TextButton.styleFrom(
