@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:luxevista_resort/pages/login_page.dart';
+import 'package:luxevista_resort/db/db_helper.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  DatabaseHelper().database.then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {

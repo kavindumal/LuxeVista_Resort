@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:luxevista_resort/db/db_helper.dart';
 import 'package:luxevista_resort/pages/dashboard_page.dart';
 import 'register_page.dart'; // Import the register page
 
@@ -14,6 +15,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   bool _rememberMe = false;
   late AnimationController _controller;
   late Animation<double> _animation;
+  final DatabaseHelper _dbHelper = DatabaseHelper();
 
   @override
   void initState() {
@@ -32,15 +34,27 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
-  void _login() {
-  if (_formKey.currentState!.validate()) {
-    _formKey.currentState!.save();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Dashboard()),
-    );
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final users = await _dbHelper.getUsers();
+      final user = users.firstWhere(
+        (user) => user['email'] == _email && user['password'] == _password,
+        orElse: () => {},
+      );
+
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboard()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invalid email or password')),
+        );
+      }
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:luxevista_resort/db/db_helper.dart';
 import 'package:luxevista_resort/pages/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -10,8 +9,6 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _auth = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
   String _name = '';
   String _email = '';
   String _phoneNumber = '';
@@ -20,7 +17,6 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
   late AnimationController _controller;
   late Animation<double> _animation;
   bool _isLoading = false;
-  
 
   @override
   void initState() {
@@ -39,53 +35,43 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
     super.dispose();
   }
 
-  void _register() {
-  if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-    }
-  } 
-
-  Future<void> _saveUserData(String uid) async {
-    await _firestore.collection('users').doc(uid).set({
-      'fullName': _name,
-      'email': _email,
-      'homeAddress': 'Not entered yet',
-      'cityPostal': 'Not entered yet',
-      'paypalEmail': 'Not entered yet',
-      'bankCard': 'Not entered yet',
-    });
-  }
-
-  Future<void> _createAccount() async {
+  void _register() async {
     if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
       setState(() {
         _isLoading = true;
       });
 
+      // Save user data to the database
+      final user = {
+        'name': _name,
+        'email': _email,
+        'password': _password,
+        'phone_number': _phoneNumber,
+      };
+
       try {
-        // Create user with email and password
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-          email: _email!,
-          password: _password!,
-        );
+        final dbHelper = DatabaseHelper();
+        await dbHelper.saveUser(user);
 
-        // Save user data in Firestore
-        await _saveUserData(userCredential.user!.uid);
+        setState(() {
+          _isLoading = false;
+        });
 
-        // Navigate to login page or dashboard
+        // Navigate to login page after successful registration
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
         );
-      } on FirebaseAuthException catch (e) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'Error occurred')),
-        );
-      } finally {
+      } catch (e) {
         setState(() {
           _isLoading = false;
         });
+
+        // Show error message if registration fails
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: $e')),
+        );
       }
     }
   }
@@ -264,7 +250,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                         ),
                         SizedBox(height: 15),
                         ElevatedButton(
-                          onPressed: _isLoading ? null : _createAccount,
+                          onPressed: _isLoading ? null : _register,
                           child: Text('Register'),
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -281,10 +267,10 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => LoginPage()),
-                                );
-                              },
+                                context,
+                                MaterialPageRoute(builder: (context) => LoginPage()),
+                              );
+                            },
                             child: Text(
                               'Already have an account? Login',
                               style: TextStyle(

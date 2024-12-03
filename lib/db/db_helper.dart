@@ -105,4 +105,88 @@ class DatabaseHelper {
       );
     ''');
   }
+
+  // Save user data
+  Future<int> saveUser(Map<String, dynamic> user) async {
+    final db = await database;
+    return await db.insert('Users', user);
+  }
+
+  // Get user data
+  Future<List<Map<String, dynamic>>> getUsers() async {
+    final db = await database;
+    return await db.query('Users');
+  }
+
+  // Save room data
+  Future<int> saveRoom(Map<String, dynamic> room) async {
+    final db = await database;
+    return await db.insert('Rooms', room);
+  }
+
+  // Get room data
+  Future<List<Map<String, dynamic>>> getRooms() async {
+    final db = await database;
+    return await db.query('Rooms');
+  }
+
+  // Save booking data
+  Future<int> saveBooking(Map<String, dynamic> booking) async {
+    final db = await database;
+    return await db.insert('Bookings', booking);
+  }
+
+  // Get booking data
+  Future<List<Map<String, dynamic>>> getBookings() async {
+    final db = await database;
+    return await db.query('Bookings');
+  }
+
+  // Save service data
+  Future<int> saveService(Map<String, dynamic> service) async {
+    final db = await database;
+    return await db.insert('Services', service);
+  }
+
+  // Get service data
+  Future<List<Map<String, dynamic>>> getServices() async {
+    final db = await database;
+    return await db.query('Services');
+  }
+
+  // Save service booking data
+  Future<int> saveServiceBooking(Map<String, dynamic> serviceBooking) async {
+    final db = await database;
+    return await db.insert('Service_Bookings', serviceBooking);
+  }
+
+  // Get service booking data
+  Future<List<Map<String, dynamic>>> getServiceBookings() async {
+    final db = await database;
+    return await db.query('Service_Bookings');
+  }
+
+  // Save attraction data
+  Future<int> saveAttraction(Map<String, dynamic> attraction) async {
+    final db = await database;
+    return await db.insert('Attractions', attraction);
+  }
+
+  // Get attraction data
+  Future<List<Map<String, dynamic>>> getAttractions() async {
+    final db = await database;
+    return await db.query('Attractions');
+  }
+
+  // Save notification data
+  Future<int> saveNotification(Map<String, dynamic> notification) async {
+    final db = await database;
+    return await db.insert('Notifications', notification);
+  }
+
+  // Get notification data
+  Future<List<Map<String, dynamic>>> getNotifications() async {
+    final db = await database;
+    return await db.query('Notifications');
+  }
 }
