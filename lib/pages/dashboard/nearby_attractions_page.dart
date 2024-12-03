@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:luxevista_resort/pages/dashboard_page.dart';
 
 class NearbyAttractionsPage extends StatelessWidget {
   @override
@@ -9,7 +10,10 @@ class NearbyAttractionsPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => Dashboard()),
+            );
           },
         ),
       ),
