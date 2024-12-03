@@ -9,14 +9,16 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   String _name = '';
   String _email = '';
   String _phoneNumber = '';
-  String _password = '';
-  String _confirmPassword = '';
+  bool _isLoading = false;
+
   late AnimationController _controller;
   late Animation<double> _animation;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -32,6 +34,8 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
   @override
   void dispose() {
     _controller.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -42,11 +46,10 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         _isLoading = true;
       });
 
-      // Save user data to the database
       final user = {
         'name': _name,
         'email': _email,
-        'password': _password,
+        'password': _passwordController.text,
         'phone_number': _phoneNumber,
       };
 
@@ -58,7 +61,6 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
           _isLoading = false;
         });
 
-        // Navigate to login page after successful registration
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
@@ -68,7 +70,6 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
           _isLoading = false;
         });
 
-        // Show error message if registration fails
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Registration failed: $e')),
         );
@@ -98,7 +99,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                   flex: 2,
                   child: Center(
                     child: Image.asset(
-                      'assets/images/login_header.png', // Replace with a suitable image in your assets folder
+                      'assets/images/login_header.png',
                       height: 150,
                     ),
                   ),
@@ -121,6 +122,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           ),
                         ),
                         SizedBox(height: 20),
+                        // Name Field
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
@@ -144,6 +146,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           },
                         ),
                         SizedBox(height: 15),
+                        // Email Field
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
@@ -171,6 +174,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           },
                         ),
                         SizedBox(height: 15),
+                        // Phone Number Field
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
@@ -195,7 +199,9 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           },
                         ),
                         SizedBox(height: 15),
+                        // Password Field
                         TextFormField(
+                          controller: _passwordController,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
@@ -217,12 +223,11 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             }
                             return null;
                           },
-                          onSaved: (value) {
-                            _password = value!;
-                          },
                         ),
                         SizedBox(height: 15),
+                        // Confirm Password Field
                         TextFormField(
+                          controller: _confirmPasswordController,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
@@ -239,13 +244,10 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             if (value!.isEmpty) {
                               return 'Please confirm your password';
                             }
-                            if (value != _password) {
+                            if (value != _passwordController.text) {
                               return 'Passwords do not match';
                             }
                             return null;
-                          },
-                          onSaved: (value) {
-                            _confirmPassword = value!;
                           },
                         ),
                         SizedBox(height: 15),
