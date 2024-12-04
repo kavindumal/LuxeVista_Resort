@@ -22,7 +22,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
     );
   }
@@ -83,6 +83,15 @@ class DatabaseHelper {
         FOREIGN KEY (user_id) REFERENCES Users(user_id),
         FOREIGN KEY (service_id) REFERENCES Services(service_id)
       );
+    ''');
+
+    await db.execute('''
+          CREATE TABLE reservations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            service TEXT,
+            date TEXT,
+            time TEXT
+          )
     ''');
 
     await db.execute('''
@@ -197,6 +206,19 @@ class DatabaseHelper {
   Future<String?> getUserDetails() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userEmail');
+  }
+
+  Future<void> addReservation(String service, String date, String time) async {
+    final db = await database;
+    await db.insert(
+      'reservations',
+      {'service': service, 'date': date, 'time': time},
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getReservations() async {
+    final db = await database;
+    return await db.query('reservations');
   }
 
   Future<void> updateUser(int userId, Map<String, dynamic> updatedData) async {

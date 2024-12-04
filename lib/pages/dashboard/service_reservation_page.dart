@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:luxevista_resort/db/db_helper.dart';
 
 class ServiceReservationPage extends StatefulWidget {
   const ServiceReservationPage({super.key});
@@ -19,15 +20,52 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   bool showForm = false;
+  List<Map<String, dynamic>> reservations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReservations();
+  }
+
+  Future<void> _fetchReservations() async {
+    final dbHelper = DatabaseHelper();
+    final data = await dbHelper.getReservations();
+    setState(() {
+      reservations = data;
+    });
+  }
+
+  Future<void> _addReservation() async {
+    if (selectedService != null && selectedDate != null && selectedTime != null) {
+      final dbHelper = DatabaseHelper();
+      await dbHelper.addReservation(
+        selectedService!,
+        selectedDate!.toIso8601String(),
+        selectedTime!.format(context),
+      );
+      await _fetchReservations();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Reserved $selectedService on ${selectedDate!.toLocal()} at ${selectedTime!.format(context)}'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a service, date, and time'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
-        child: showForm
-            ? _buildReservationForm()
-            : _buildReserveNowPage(),
+        child: showForm ? _buildReservationForm() : _buildReservationList(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -36,35 +74,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
           });
         },
         backgroundColor: Colors.blue.shade700,
-        child: Icon(showForm ? Icons.close : Icons.edit, size: 28),
-      ),
-    );
-  }
-
-  Widget _buildReserveNowPage() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.calendar_today, size: 100, color: Colors.blue.shade700),
-          const SizedBox(height: 20),
-          Text(
-            'Reserve a Service',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade700,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Tap the button below to get started.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
-            ),
-          ),
-        ],
+        child: Icon(showForm ? Icons.close : Icons.add, size: 28),
       ),
     );
   }
@@ -141,24 +151,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
           const SizedBox(height: 30),
           Center(
             child: ElevatedButton(
-              onPressed: () {
-                if (selectedService != null &&
-                    selectedDate != null &&
-                    selectedTime != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Reserved $selectedService on ${selectedDate!.toLocal()} at ${selectedTime!.format(context)}'),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please select a service, date, and time'),
-                    ),
-                  );
-                }
-              },
+              onPressed: _addReservation,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 backgroundColor: Colors.blue.shade700,
@@ -174,6 +167,31 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildReservationList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: reservations.length,
+      itemBuilder: (context, index) {
+        final reservation = reservations[index];
+        return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 4,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            title: Text(reservation['service']),
+            subtitle: Text(
+              'Date: ${DateTime.parse(reservation['date']).toLocal()}'
+              '\nTime: ${reservation['time']}',
+            ),
+            leading: Icon(Icons.event, color: Colors.blue.shade700),
+          ),
+        );
+      },
     );
   }
 

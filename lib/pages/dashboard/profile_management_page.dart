@@ -17,7 +17,6 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
   void initState() {
     super.initState();
     _fetchUserData();
-    _fetchBookingHistory();
   }
 
   Future<void> _fetchUserData() async {
@@ -26,18 +25,22 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
 
     if (userEmail != null) {
       final user = await dbHelper.getUserByEmail(userEmail);
-      setState(() {
-        userDetails = user;
-      });
-    } else {
+      if (user != null) {
+        setState(() {
+          userDetails = user;
+        });
+        _fetchBookingHistory(user['user_id']); // Pass user_id for filtering
+      }
     }
   }
 
-  Future<void> _fetchBookingHistory() async {
+  Future<void> _fetchBookingHistory(int userId) async {
     final dbHelper = DatabaseHelper();
     final bookings = await dbHelper.getBookings();
+
     setState(() {
-      bookingHistory = bookings.where((booking) => booking['user_id'] == userDetails?['user_id']).toList();
+      // Filter bookings based on user_id
+      bookingHistory = bookings.where((booking) => booking['user_id'] == userId).toList();
     });
   }
 
@@ -98,7 +101,7 @@ class _ProfileManagementPageState extends State<ProfileManagementPage> {
 
                 await dbHelper.updateUser(userDetails?['user_id'], updatedData);
 
-                await _fetchUserData();
+                await _fetchUserData(); // Refetch user data after update
                 Navigator.of(context).pop();
               },
               child: const Text('Save'),

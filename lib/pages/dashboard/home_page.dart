@@ -104,7 +104,9 @@ class _HomePageState extends State<HomePage> {
                     "Room Booking",
                     "Explore and book luxurious rooms with stunning views.",
                     Icons.hotel,
-                    () => Navigator.pushNamed(context, '/roomBooking'),
+                    () => _showPopupMessage(
+                      "This feature is not available yet. Sorry for the inconvenience.",
+                    ),
                   ),
                   const SizedBox(height: 16),
                   _buildFeatureCard(
@@ -112,7 +114,9 @@ class _HomePageState extends State<HomePage> {
                     "Services",
                     "Reserve spa treatments, cabanas, and fine dining.",
                     Icons.spa,
-                    () => Navigator.pushNamed(context, '/services'),
+                    () => _showPopupMessage(
+                      "This feature is not available yet. Sorry for the inconvenience.",
+                    ),
                   ),
                   const SizedBox(height: 16),
                   _buildFeatureCard(
