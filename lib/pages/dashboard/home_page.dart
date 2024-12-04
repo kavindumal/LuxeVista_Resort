@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:luxevista_resort/pages/dashboard/nearby_attractions_page.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +15,7 @@ class HomePage extends StatelessWidget {
               children: [
                 Container(
                   height: 250,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage("assets/images/resort.jpg"),
                       fit: BoxFit.cover,
@@ -33,7 +35,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned(
+                const Positioned(
                   bottom: 20,
                   left: 16,
                   right: 16,
@@ -73,7 +75,7 @@ class HomePage extends StatelessWidget {
                       Navigator.pushNamed(context, '/roomBooking');
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildFeatureCard(
                     context,
                     "Services",
@@ -83,7 +85,7 @@ class HomePage extends StatelessWidget {
                       Navigator.pushNamed(context, '/services');
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildFeatureCard(
                     context,
                     "Nearby Attractions",
@@ -92,7 +94,7 @@ class HomePage extends StatelessWidget {
                     () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => NearbyAttractionsPage()),
+                        MaterialPageRoute(builder: (context) => const NearbyAttractionsPage()),
                       );
                     },
                   ),
@@ -133,7 +135,7 @@ class HomePage extends StatelessWidget {
                 size: 40,
                 color: Colors.blue.shade700,
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +148,7 @@ class HomePage extends StatelessWidget {
                         color: Colors.blue.shade700,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(

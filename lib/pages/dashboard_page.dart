@@ -6,7 +6,9 @@ import 'package:luxevista_resort/pages/dashboard/service_reservation_page.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class Dashboard extends StatefulWidget {
-  static final title = 'LuxeVista Resort';
+  static const title = 'LuxeVista Resort';
+
+  const Dashboard({super.key});
 
   @override
   _DashboardState createState() => _DashboardState();
@@ -16,10 +18,10 @@ class _DashboardState extends State<Dashboard> {
   var _currentIndex = 0;
 
   final List<Widget> _pages = [
-    HomePage(),
-    RoomBookingPage(),
-    ServiceReservationPage(),
-    ProfileManagementPage(),
+    const HomePage(),
+    const RoomBookingPage(),
+    const ServiceReservationPage(),
+    const ProfileManagementPage(),
   ];
 
   @override
@@ -32,7 +34,7 @@ class _DashboardState extends State<Dashboard> {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text(Dashboard.title),
+          title: const Text(Dashboard.title),
           backgroundColor: Colors.blue.shade700,
         ),
         body: _pages[_currentIndex],
@@ -50,29 +52,29 @@ class _DashboardState extends State<Dashboard> {
             items: [
               /// Home
               SalomonBottomBarItem(
-                icon: Icon(Icons.home),
-                title: Text("Home"),
+                icon: const Icon(Icons.home),
+                title: const Text("Home"),
                 selectedColor: Colors.purple,
               ),
 
               /// Room Booking
               SalomonBottomBarItem(
-                icon: Icon(Icons.hotel),
-                title: Text("Rooms"),
+                icon: const Icon(Icons.hotel),
+                title: const Text("Rooms"),
                 selectedColor: Colors.pink,
               ),
 
               /// Service Reservation
               SalomonBottomBarItem(
-                icon: Icon(Icons.spa),
-                title: Text("Services"),
+                icon: const Icon(Icons.spa),
+                title: const Text("Services"),
                 selectedColor: Colors.orange,
               ),
 
               /// Profile
               SalomonBottomBarItem(
-                icon: Icon(Icons.person),
-                title: Text("Profile"),
+                icon: const Icon(Icons.person),
+                title: const Text("Profile"),
                 selectedColor: Colors.teal,
               ),
             ],

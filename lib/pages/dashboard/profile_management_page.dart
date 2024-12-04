@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ProfileManagementPage extends StatelessWidget {
+  const ProfileManagementPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,13 +18,13 @@ class ProfileManagementPage extends StatelessWidget {
                 _buildProfileDetail('Email', 'john.doe@example.com'),
                 _buildProfileDetail('Phone Number', '+1234567890'),
               ]),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildSectionTitle('Preferences'),
               _buildProfileCard([
                 _buildProfileDetail('Room Type', 'Deluxe'),
                 _buildProfileDetail('Interests', 'Spa, Fine Dining'),
               ]),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildSectionTitle('Booking History'),
               _buildBookingHistory(),
             ],
@@ -33,8 +35,8 @@ class ProfileManagementPage extends StatelessWidget {
         onPressed: () {
           // Add edit profile functionality
         },
-        label: Text('Edit Profile'),
-        icon: Icon(Icons.edit),
+        label: const Text('Edit Profile'),
+        icon: const Icon(Icons.edit),
         backgroundColor: Colors.blue.shade700,
       ),
     );
@@ -57,7 +59,7 @@ class ProfileManagementPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -89,7 +91,7 @@ class ProfileManagementPage extends StatelessWidget {
             flex: 3,
             child: Text(
               detail,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black87,
               ),
@@ -106,18 +108,18 @@ class ProfileManagementPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: ListView.builder(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: 5,
         itemBuilder: (context, index) {
           return ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: Icon(Icons.hotel, color: Colors.blue.shade700),
             title: Text(
               'Booking #${index + 1}',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             subtitle: Text(
               'Room - Deluxe\nDate: 2023-10-01',

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ServiceReservationPage extends StatefulWidget {
+  const ServiceReservationPage({super.key});
+
   @override
   _ServiceReservationPageState createState() => _ServiceReservationPageState();
 }
@@ -22,7 +24,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedSwitcher(
-        duration: Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 400),
         child: showForm
             ? _buildReservationForm()
             : _buildReserveNowPage(),
@@ -45,7 +47,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.calendar_today, size: 100, color: Colors.blue.shade700),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             'Reserve a Service',
             style: TextStyle(
@@ -54,7 +56,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
               color: Colors.blue.shade700,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'Tap the button below to get started.',
             style: TextStyle(
@@ -77,7 +79,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
             title: 'Select a Service',
             child: DropdownButton<String>(
               value: selectedService,
-              hint: Text('Choose a service'),
+              hint: const Text('Choose a service'),
               isExpanded: true,
               onChanged: (String? newValue) {
                 setState(() {
@@ -92,7 +94,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
               }).toList(),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           _buildAnimatedCard(
             title: 'Select a Date',
             child: ElevatedButton.icon(
@@ -109,13 +111,13 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
                   });
                 }
               },
-              icon: Icon(Icons.calendar_today),
+              icon: const Icon(Icons.calendar_today),
               label: Text(selectedDate == null
                   ? 'Choose a date'
                   : '${selectedDate!.toLocal()}'.split(' ')[0]),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           _buildAnimatedCard(
             title: 'Select a Time',
             child: ElevatedButton.icon(
@@ -130,13 +132,13 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
                   });
                 }
               },
-              icon: Icon(Icons.access_time),
+              icon: const Icon(Icons.access_time),
               label: Text(selectedTime == null
                   ? 'Choose a time'
                   : selectedTime!.format(context)),
             ),
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           Center(
             child: ElevatedButton(
               onPressed: () {
@@ -151,20 +153,20 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Please select a service, date, and time'),
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 backgroundColor: Colors.blue.shade700,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Confirm Reservation',
                 style: TextStyle(fontSize: 16),
               ),
@@ -194,7 +196,7 @@ class _ServiceReservationPageState extends State<ServiceReservationPage> {
                 color: Colors.blue.shade700,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             child,
           ],
         ),

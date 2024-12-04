@@ -3,6 +3,8 @@ import 'package:luxevista_resort/db/db_helper.dart';
 import 'package:luxevista_resort/pages/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -55,23 +57,36 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
 
       try {
         final dbHelper = DatabaseHelper();
-        await dbHelper.saveUser(user);
+        int userId = await dbHelper.saveUser(user);
 
         setState(() {
           _isLoading = false;
         });
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
+        if (userId > 0) {
+          // Registration successful
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration successful!')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+          );
+        } else {
+          throw Exception("Failed to save user.");
+        }
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
 
+        String errorMessage = 'Registration failed';
+        if (e.toString().contains('UNIQUE constraint failed')) {
+          errorMessage = 'Email already exists. Please use a different email.';
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed: $e')),
+          SnackBar(content: Text(errorMessage)),
         );
       }
     }
@@ -111,7 +126,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                     child: ListView(
                       shrinkWrap: true,
                       children: <Widget>[
-                        Center(
+                        const Center(
                           child: Text(
                             'Create Account',
                             style: TextStyle(
@@ -121,19 +136,19 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Name Field
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Name',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.person, color: Colors.white),
+                            prefixIcon: const Icon(Icons.person, color: Colors.white),
                           ),
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -145,19 +160,19 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             _name = value!;
                           },
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         // Email Field
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Email',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.email, color: Colors.white),
+                            prefixIcon: const Icon(Icons.email, color: Colors.white),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
@@ -173,19 +188,19 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             _email = value!;
                           },
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         // Phone Number Field
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Phone Number',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.phone, color: Colors.white),
+                            prefixIcon: const Icon(Icons.phone, color: Colors.white),
                           ),
                           keyboardType: TextInputType.phone,
                           validator: (value) {
@@ -198,7 +213,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             _phoneNumber = value!;
                           },
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         // Password Field
                         TextFormField(
                           controller: _passwordController,
@@ -206,12 +221,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Password',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.lock, color: Colors.white),
+                            prefixIcon: const Icon(Icons.lock, color: Colors.white),
                           ),
                           obscureText: true,
                           validator: (value) {
@@ -224,7 +239,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             return null;
                           },
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         // Confirm Password Field
                         TextFormField(
                           controller: _confirmPasswordController,
@@ -232,12 +247,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.2),
                             labelText: 'Confirm Password',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.lock, color: Colors.white),
+                            prefixIcon: const Icon(Icons.lock, color: Colors.white),
                           ),
                           obscureText: true,
                           validator: (value) {
@@ -250,30 +265,30 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             return null;
                           },
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         ElevatedButton(
                           onPressed: _isLoading ? null : _register,
-                          child: Text('Register'),
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             backgroundColor: Colors.white.withOpacity(0.8),
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            textStyle: TextStyle(fontSize: 18, color: Colors.blue),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            textStyle: const TextStyle(fontSize: 18, color: Colors.blue),
                             elevation: 5,
                           ),
+                          child: const Text('Register'),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Center(
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => LoginPage()),
+                                MaterialPageRoute(builder: (context) => const LoginPage()),
                               );
                             },
-                            child: Text(
+                            child: const Text(
                               'Already have an account? Login',
                               style: TextStyle(
                                 color: Colors.white,

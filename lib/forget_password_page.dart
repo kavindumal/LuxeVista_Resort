@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:luxevista_resort/db/db_helper.dart';
-import 'package:luxevista_resort/forget_password_page.dart';
-import 'package:luxevista_resort/pages/dashboard_page.dart';
-import 'register_page.dart'; // Import the register page
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class ForgetPasswordPage extends StatefulWidget {
+  const ForgetPasswordPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _ForgetPasswordPageState createState() => _ForgetPasswordPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _ForgetPasswordPageState extends State<ForgetPasswordPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
-  String _password = '';
-  bool _rememberMe = false;
   late AnimationController _controller;
   late Animation<double> _animation;
   final DatabaseHelper _dbHelper = DatabaseHelper();
@@ -37,20 +32,26 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
-  void _login() async {
+  void _resetPassword() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final users = await _dbHelper.getUsers();
       final user = users.firstWhere(
-        (user) => user['email'] == _email && user['password'] == _password,
+        (user) => user['email'] == _email,
         orElse: () => {},
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Dashboard()),
-      );
-        }
+      if (user.isNotEmpty) {
+        // Implement password reset logic here
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password reset link sent to your email')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email not found')),
+        );
+      }
+    }
   }
 
   @override
@@ -89,7 +90,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       children: <Widget>[
                         const Center(
                           child: Text(
-                            'Welcome Back!',
+                            'Reset Password',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -125,54 +126,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           },
                         ),
                         const SizedBox(height: 15),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.2),
-                            labelText: 'Password',
-                            labelStyle: const TextStyle(color: Colors.white),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            prefixIcon: const Icon(Icons.lock, color: Colors.white),
-                          ),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters long';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _password = value!;
-                          },
-                        ),
-                        const SizedBox(height: 15),
-                        Row(
-                          children: <Widget>[
-                            Checkbox(
-                              value: _rememberMe,
-                              onChanged: (value) {
-                                setState(() {
-                                  _rememberMe = value!;
-                                });
-                              },
-                              activeColor: Colors.white,
-                              checkColor: Colors.blue,
-                            ),
-                            const Text(
-                              'Remember Me',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
                         ElevatedButton(
-                          onPressed: _login,
+                          onPressed: _resetPassword,
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -182,31 +137,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             textStyle: const TextStyle(fontSize: 18, color: Colors.blue),
                             elevation: 5,
                           ),
-                          child: const Text('Login'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ForgetPasswordPage()),
-                              );
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('Forgot Password?'),
+                          child: const Text('Reset Password'),
                         ),
                         const SizedBox(height: 10),
                         Center(
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const RegisterPage()),
-                              );
+                              Navigator.pop(context);
                             },
                             child: const Text(
-                              'Don\'t have an account? Register',
+                              'Back to Login',
                               style: TextStyle(
                                 color: Colors.white,
                                 decoration: TextDecoration.underline,

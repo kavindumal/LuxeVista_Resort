@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class RoomBookingPage extends StatefulWidget {
+  const RoomBookingPage({super.key});
+
   @override
   _RoomBookingPageState createState() => _RoomBookingPageState();
 }
@@ -17,7 +19,7 @@ class _RoomBookingPageState extends State<RoomBookingPage>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
     );
 
     _fadeInAnimation = CurvedAnimation(
@@ -40,7 +42,7 @@ class _RoomBookingPageState extends State<RoomBookingPage>
       onTap: onTap,
       child: Card(
         elevation: 8,
-        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           decoration: BoxDecoration(
@@ -59,29 +61,29 @@ class _RoomBookingPageState extends State<RoomBookingPage>
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   description,
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
-                Spacer(),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       price,
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
-                    Icon(
+                    const Icon(
                       Icons.arrow_forward_ios,
                       color: Colors.white,
                     ),
@@ -110,7 +112,7 @@ class _RoomBookingPageState extends State<RoomBookingPage>
                 children: [
                   DropdownButton<String>(
                     value: selectedRoomType,
-                    hint: Text("Room Type"),
+                    hint: const Text("Room Type"),
                     items: ["Ocean View", "Deluxe", "Standard"]
                         .map((String type) {
                       return DropdownMenuItem(
@@ -126,7 +128,7 @@ class _RoomBookingPageState extends State<RoomBookingPage>
                   ),
                   DropdownButton<String>(
                     value: selectedPriceRange,
-                    hint: Text("Price Range"),
+                    hint: const Text("Price Range"),
                     items: ["\$100-\$200", "\$200-\$300", "\$300+"]
                         .map((String range) {
                       return DropdownMenuItem(

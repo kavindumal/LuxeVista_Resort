@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:luxevista_resort/pages/dashboard_page.dart';
 
 class NearbyAttractionsPage extends StatelessWidget {
+  const NearbyAttractionsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nearby Attractions'),
+        title: const Text('Nearby Attractions'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => Dashboard()),
+              MaterialPageRoute(builder: (context) => const Dashboard()),
             );
           },
         ),
@@ -43,7 +45,7 @@ class NearbyAttractionsPage extends StatelessWidget {
                 flex: 3,
                 child: ListView(
                   shrinkWrap: true,
-                  children: <Widget>[
+                  children: const <Widget>[
                     Center(
                       child: Text(
                         'Nearby Attractions',
