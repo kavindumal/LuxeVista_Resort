@@ -38,20 +38,31 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   void _login() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final users = await _dbHelper.getUsers();
-      final user = users.firstWhere(
-        (user) => user['email'] == _email && user['password'] == _password,
-        orElse: () => {},
-      );
+  if (_formKey.currentState!.validate()) {
+    _formKey.currentState!.save();
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Dashboard()),
+    try {
+      final user = await _dbHelper.getUserByEmailAndPassword(_email, _password);
+
+      if (user != null) {
+        await _dbHelper.saveUserDetails(_email);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Dashboard()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid email or password')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: ${e.toString()}')),
       );
-        }
+    }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

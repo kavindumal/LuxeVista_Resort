@@ -42,7 +42,6 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> with SingleTick
       );
 
       if (user.isNotEmpty) {
-        // Implement password reset logic here
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Password reset link sent to your email')),
         );

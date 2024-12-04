@@ -1,8 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:luxevista_resort/pages/dashboard/nearby_attractions_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // State to manage expanded/collapsed card states
+  final Map<String, bool> _expanded = {
+    "Room Booking": false,
+    "Services": false,
+    "Nearby Attractions": false,
+  };
+
+  void _toggleExpand(String cardTitle) {
+    setState(() {
+      _expanded[cardTitle] = !_expanded[cardTitle]!;
+    });
+  }
+
+  void _showPopupMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Feature Unavailable"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +94,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // Navigation Options
+            // Feature Cards
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
@@ -71,9 +104,7 @@ class HomePage extends StatelessWidget {
                     "Room Booking",
                     "Explore and book luxurious rooms with stunning views.",
                     Icons.hotel,
-                    () {
-                      Navigator.pushNamed(context, '/roomBooking');
-                    },
+                    () => Navigator.pushNamed(context, '/roomBooking'),
                   ),
                   const SizedBox(height: 16),
                   _buildFeatureCard(
@@ -81,9 +112,7 @@ class HomePage extends StatelessWidget {
                     "Services",
                     "Reserve spa treatments, cabanas, and fine dining.",
                     Icons.spa,
-                    () {
-                      Navigator.pushNamed(context, '/services');
-                    },
+                    () => Navigator.pushNamed(context, '/services'),
                   ),
                   const SizedBox(height: 16),
                   _buildFeatureCard(
@@ -91,12 +120,9 @@ class HomePage extends StatelessWidget {
                     "Nearby Attractions",
                     "Discover exciting activities and attractions nearby.",
                     Icons.place,
-                    () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const NearbyAttractionsPage()),
-                      );
-                    },
+                    () => _showPopupMessage(
+                      "This feature is not available yet. Sorry for the inconvenience.",
+                    ),
                   ),
                 ],
               ),
@@ -116,58 +142,80 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Helper Method to Create Feature Cards
   Widget _buildFeatureCard(BuildContext context, String title, String subtitle,
-      IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+  IconData icon, VoidCallback onTap) {
+  final isExpanded = _expanded[title] ?? false;
+  return GestureDetector(
+  onTap: () => _toggleExpand(title),
+  child: Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    ),
+    child: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+      Row(
+        children: [
+        Icon(
+          icon,
+          size: 40,
+          color: Colors.blue.shade700,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 40,
-                color: Colors.blue.shade700,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Colors.grey.shade700,
-              ),
-            ],
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue.shade700,
+          ),
           ),
         ),
+        Icon(
+          isExpanded
+            ? Icons.keyboard_arrow_up
+            : Icons.keyboard_arrow_down,
+          size: 24,
+          color: Colors.grey.shade700,
+        ),
+        ],
       ),
-    );
-  }
+      if (isExpanded) ...[
+        const SizedBox(height: 8),
+        Text(
+        subtitle,
+        style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+        ),
+        const SizedBox(height: 12),
+        ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Colors.blue.shade700,
+          padding: const EdgeInsets.symmetric(
+          horizontal: 24.0,
+          vertical: 12.0,
+          ),
+        ),
+        child: const Text(
+          "Learn More",
+          style: TextStyle(
+          fontSize: 16,
+          color: Colors.white,
+          ),
+        ),
+        ),
+      ],
+      ],
+    ),
+    ),
+  ),
+  );
+}
 }

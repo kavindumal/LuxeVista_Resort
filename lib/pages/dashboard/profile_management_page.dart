@@ -1,7 +1,113 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:luxevista_resort/db/db_helper.dart';
 
-class ProfileManagementPage extends StatelessWidget {
+class ProfileManagementPage extends StatefulWidget {
   const ProfileManagementPage({super.key});
+
+  @override
+  _ProfileManagementPageState createState() => _ProfileManagementPageState();
+}
+
+class _ProfileManagementPageState extends State<ProfileManagementPage> {
+  Map<String, dynamic>? userDetails;
+  List<Map<String, dynamic>> bookingHistory = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+    _fetchBookingHistory();
+  }
+
+  Future<void> _fetchUserData() async {
+    final dbHelper = DatabaseHelper();
+    final userEmail = await dbHelper.getUserDetails();
+
+    if (userEmail != null) {
+      final user = await dbHelper.getUserByEmail(userEmail);
+      setState(() {
+        userDetails = user;
+      });
+    } else {
+    }
+  }
+
+  Future<void> _fetchBookingHistory() async {
+    final dbHelper = DatabaseHelper();
+    final bookings = await dbHelper.getBookings();
+    setState(() {
+      bookingHistory = bookings.where((booking) => booking['user_id'] == userDetails?['user_id']).toList();
+    });
+  }
+
+  Future<void> _showEditProfileDialog() async {
+    final nameController = TextEditingController(text: userDetails?['name']);
+    final emailController = TextEditingController(text: userDetails?['email']);
+    final phoneController = TextEditingController(text: userDetails?['phone_number']);
+    final passwordController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Profile'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                ),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                ),
+                TextField(
+                  controller: phoneController,
+                  decoration: const InputDecoration(labelText: 'Phone Number'),
+                ),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'New Password'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final dbHelper = DatabaseHelper();
+                final updatedData = {
+                  'name': nameController.text,
+                  'email': emailController.text,
+                  'phone_number': phoneController.text,
+                };
+
+                if (passwordController.text.isNotEmpty) {
+                  updatedData['password'] = passwordController.text;
+                }
+
+                await dbHelper.updateUser(userDetails?['user_id'], updatedData);
+
+                await _fetchUserData();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +120,9 @@ class ProfileManagementPage extends StatelessWidget {
             children: [
               _buildSectionTitle('User Details'),
               _buildProfileCard([
-                _buildProfileDetail('Name', 'John Doe'),
-                _buildProfileDetail('Email', 'john.doe@example.com'),
-                _buildProfileDetail('Phone Number', '+1234567890'),
+                _buildProfileDetail('Name', userDetails?['name'] ?? 'Loading...'),
+                _buildProfileDetail('Email', userDetails?['email'] ?? 'Loading...'),
+                _buildProfileDetail('Phone Number', userDetails?['phone_number'] ?? 'Loading...'),
               ]),
               const SizedBox(height: 20),
               _buildSectionTitle('Preferences'),
@@ -32,9 +138,7 @@ class ProfileManagementPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Add edit profile functionality
-        },
+        onPressed: _showEditProfileDialog,
         label: const Text('Edit Profile'),
         icon: const Icon(Icons.edit),
         backgroundColor: Colors.blue.shade700,
@@ -112,17 +216,18 @@ class ProfileManagementPage extends StatelessWidget {
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 5,
+        itemCount: bookingHistory.length,
         itemBuilder: (context, index) {
+          final booking = bookingHistory[index];
           return ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: Icon(Icons.hotel, color: Colors.blue.shade700),
             title: Text(
-              'Booking #${index + 1}',
+              'Booking #${booking['booking_id']}',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             subtitle: Text(
-              'Room - Deluxe\nDate: 2023-10-01',
+              'Room - ${booking['room_id']}\nDate: ${booking['check_in_date']}',
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade600),

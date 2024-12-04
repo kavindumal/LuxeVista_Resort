@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:luxevista_resort/db/db_helper.dart';
 
 class RoomBookingPage extends StatefulWidget {
   const RoomBookingPage({super.key});
 
   @override
-  _RoomBookingPageState createState() => _RoomBookingPageState();
+  RoomBookingPageState createState() => RoomBookingPageState();
 }
 
-class _RoomBookingPageState extends State<RoomBookingPage>
+class RoomBookingPageState extends State<RoomBookingPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeInAnimation;
+
   String? selectedRoomType;
   String? selectedPriceRange;
+  final List<Map<String, String>> bookedRooms = [];
 
   @override
   void initState() {
@@ -36,25 +39,82 @@ class _RoomBookingPageState extends State<RoomBookingPage>
     super.dispose();
   }
 
+  void _bookRoom(String title, String description, String price) async {
+    final dbHelper = DatabaseHelper();
+    
+    const userId = 1;
+
+    final rooms = await dbHelper.getRooms();
+    final room = rooms.firstWhere(
+      (r) => r['description'] == description && r['room_type'] == title,
+      orElse: () => {},
+    );
+
+    if (room == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to book $title. Room not found in database.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final roomId = room['room_id'];
+
+    final booking = {
+      "user_id": userId,
+      "room_id": roomId,
+      "check_in_date": DateTime.now().toIso8601String(),
+      "check_out_date": DateTime.now().add(const Duration(days: 1)).toIso8601String(),
+      "status": "Booked",
+    };
+
+    final result = await dbHelper.saveBooking(booking);
+
+    if (result > 0) {
+      setState(() {
+        bookedRooms.add({
+          "title": title,
+          "description": description,
+          "price": price,
+        });
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$title has been booked successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to book $title.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Widget _buildRoomCard(String title, String description, String price,
       String imagePath, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 8,
-        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            image: DecorationImage(
-              image: AssetImage(imagePath),
+    return Card(
+      elevation: 8,
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Image.asset(
+              imagePath,
+              height: 200,
+              width: double.infinity,
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.3), BlendMode.darken),
             ),
           ),
-          child: Padding(
+          Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +122,7 @@ class _RoomBookingPageState extends State<RoomBookingPage>
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -70,28 +130,51 @@ class _RoomBookingPageState extends State<RoomBookingPage>
                 const SizedBox(height: 10),
                 Text(
                   description,
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
-                const Spacer(),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       price,
                       style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
+                    ElevatedButton(
+                      onPressed: () => _bookRoom(title, description, price),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text("Book"),
                     ),
                   ],
                 ),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBookedRoomCard(Map<String, String> room) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: const Icon(Icons.hotel, color: Colors.blue),
+        title: Text(room['title']!),
+        subtitle: Text(room['description']!),
+        trailing: Text(
+          room['price']!,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -100,90 +183,107 @@ class _RoomBookingPageState extends State<RoomBookingPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FadeTransition(
-        opacity: _fadeInAnimation,
-        child: Column(
-          children: [
-            // Filter Section
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  DropdownButton<String>(
-                    value: selectedRoomType,
-                    hint: const Text("Room Type"),
-                    items: ["Ocean View", "Deluxe", "Standard"]
-                        .map((String type) {
-                      return DropdownMenuItem(
-                        value: type,
-                        child: Text(type),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedRoomType = value;
-                      });
-                    },
-                  ),
-                  DropdownButton<String>(
-                    value: selectedPriceRange,
-                    hint: const Text("Price Range"),
-                    items: ["\$100-\$200", "\$200-\$300", "\$300+"]
-                        .map((String range) {
-                      return DropdownMenuItem(
-                        value: range,
-                        child: Text(range),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedPriceRange = value;
-                      });
-                    },
-                  ),
-                ],
+      body: SingleChildScrollView(
+        child: FadeTransition(
+          opacity: _fadeInAnimation,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Filter Section
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    DropdownButton<String>(
+                      value: selectedRoomType,
+                      hint: const Text("Room Type"),
+                      items: ["Ocean View", "Deluxe", "Standard"]
+                          .map((String type) {
+                        return DropdownMenuItem(
+                          value: type,
+                          child: Text(type),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedRoomType = value;
+                        });
+                      },
+                    ),
+                    DropdownButton<String>(
+                      value: selectedPriceRange,
+                      hint: const Text("Price Range"),
+                      items: ["\$100-\$200", "\$200-\$300", "\$300+"]
+                          .map((String range) {
+                        return DropdownMenuItem(
+                          value: range,
+                          child: Text(range),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedPriceRange = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // Room Cards
-            Expanded(
-              child: ListView(
+              // Room Cards
+              ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _buildRoomCard(
                     "Ocean View Suite",
                     "Enjoy a breathtaking ocean view with luxurious amenities.",
                     "\$250/night",
                     "assets/images/ocean_view.jpg",
-                    () {
-                      // Navigate to booking page
-                      print("Ocean View Suite tapped");
-                    },
+                    () {},
                   ),
                   _buildRoomCard(
                     "Deluxe Room",
                     "Spacious deluxe room with a cozy ambiance.",
                     "\$200/night",
                     "assets/images/deluxe_room.jpg",
-                    () {
-                      // Navigate to booking page
-                      print("Deluxe Room tapped");
-                    },
+                    () {},
                   ),
                   _buildRoomCard(
                     "Standard Room",
                     "A comfortable standard room for your stay.",
                     "\$150/night",
                     "assets/images/standard_room.jpg",
-                    () {
-                      // Navigate to booking page
-                      print("Standard Room tapped");
-                    },
+                    () {},
                   ),
                 ],
               ),
-            ),
-          ],
+
+              // Booked Rooms Section
+              if (bookedRooms.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    "Your Booked Rooms",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade700,
+                    ),
+                  ),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: bookedRooms.length,
+                  itemBuilder: (context, index) {
+                    return _buildBookedRoomCard(bookedRooms[index]);
+                  },
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

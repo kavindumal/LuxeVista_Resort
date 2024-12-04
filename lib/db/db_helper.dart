@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -106,87 +107,117 @@ class DatabaseHelper {
     ''');
   }
 
-  // Save user data
   Future<int> saveUser(Map<String, dynamic> user) async {
     final db = await database;
     return await db.insert('Users', user);
   }
 
-  // Get user data
   Future<List<Map<String, dynamic>>> getUsers() async {
     final db = await database;
     return await db.query('Users');
   }
 
-  // Save room data
   Future<int> saveRoom(Map<String, dynamic> room) async {
     final db = await database;
     return await db.insert('Rooms', room);
   }
 
-  // Get room data
   Future<List<Map<String, dynamic>>> getRooms() async {
     final db = await database;
     return await db.query('Rooms');
   }
 
-  // Save booking data
   Future<int> saveBooking(Map<String, dynamic> booking) async {
     final db = await database;
     return await db.insert('Bookings', booking);
   }
 
-  // Get booking data
   Future<List<Map<String, dynamic>>> getBookings() async {
     final db = await database;
     return await db.query('Bookings');
   }
 
-  // Save service data
   Future<int> saveService(Map<String, dynamic> service) async {
     final db = await database;
     return await db.insert('Services', service);
   }
 
-  // Get service data
   Future<List<Map<String, dynamic>>> getServices() async {
     final db = await database;
     return await db.query('Services');
   }
 
-  // Save service booking data
   Future<int> saveServiceBooking(Map<String, dynamic> serviceBooking) async {
     final db = await database;
     return await db.insert('Service_Bookings', serviceBooking);
   }
 
-  // Get service booking data
   Future<List<Map<String, dynamic>>> getServiceBookings() async {
     final db = await database;
     return await db.query('Service_Bookings');
   }
 
-  // Save attraction data
   Future<int> saveAttraction(Map<String, dynamic> attraction) async {
     final db = await database;
     return await db.insert('Attractions', attraction);
   }
 
-  // Get attraction data
   Future<List<Map<String, dynamic>>> getAttractions() async {
     final db = await database;
     return await db.query('Attractions');
   }
 
-  // Save notification data
   Future<int> saveNotification(Map<String, dynamic> notification) async {
     final db = await database;
     return await db.insert('Notifications', notification);
   }
 
-  // Get notification data
   Future<List<Map<String, dynamic>>> getNotifications() async {
     final db = await database;
     return await db.query('Notifications');
+  }
+
+  Future<Map<String, dynamic>?> getUserByEmailAndPassword(String email, String password) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'users',
+      where: 'email = ? AND password = ?',
+      whereArgs: [email, password],
+    );
+
+    return result.isNotEmpty ? result.first : null;
+  }
+
+
+  Future<void> saveUserDetails(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userEmail', email);
+  }
+
+  Future<String?> getUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userEmail');
+  }
+
+  Future<void> updateUser(int userId, Map<String, dynamic> updatedData) async {
+    final db = await database;
+    await db.update('Users', updatedData, where: 'user_id = ?', whereArgs: [userId]);
+  }
+
+  Future<Map<String, dynamic>?> getUserByEmail(String email) async {
+    final db = await database;
+
+    final result = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email], 
+      limit: 1,
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+
+    return null;
   }
 }
